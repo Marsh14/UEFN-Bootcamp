@@ -1,0 +1,61 @@
+{
+	"fileVersion": 15,
+	"title": "ZombieDefense",
+	"description": "",
+	"keyArt": "Resources/Icon128.png",
+	"docsUrl": "",
+	"apiAccess": "Private",
+	"bindings":
+	{
+		"projectId": "b203b03f-4a70-74ee-eeda-04810973356e",
+		"modules":
+		{
+			"ZombieDefense": "d22944e6-4733-ccdc-e5f4-d09cb6c4e582"
+		},
+		"bSuppressAutomaticVersePathAssignment": false,
+		"projectVersePath": ""
+	},
+	"compatibilityVersion": "41.30",
+	"requiredRedirectorStartingVersion": "41.30.55979764",
+	"editorPermissions": [],
+	"epicApp": "",
+	"sortPriority": 0,
+	"featureSet": "",
+	"plugins": [
+		{
+			"name": "ZombieDefense",
+			"bIsRoot": true,
+			"bIsPublic": false
+		}
+	],
+	"dataSets":
+	{
+		"matchmaking":
+		{
+			"maxPlayers": 16,
+			"maxTeamCount": 16,
+			"maxTeamSize": 16,
+			"maxSocialPartySize": 16,
+			"allowJoinInProgress": true,
+			"allowSquadFillOption": false,
+			"islandQueuePrivacy": "Public",
+			"minPlayers": 1,
+			"overtimePlayerTarget": 1,
+			"queueMainDuration": 5,
+			"queueOvertimeDuration": 5,
+			"useSkillBasedMatchmaking": false,
+			"ratingType": "",
+			"splitscreenDisabled": false,
+			"version": 1
+		},
+		"experimental":
+		{
+			"sceneGraph":
+			{
+				"bIsSceneGraphSystemAllowed": true,
+				"bEnableOneFilePerEntity": false
+			},
+			"version": 1
+		}
+	}
+}
