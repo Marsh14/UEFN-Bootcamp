@@ -26,3 +26,6 @@ Plugins/**/Binaries/
 *.VC.db
 *.VC.opendb
 .vsconfig
+
+# Local IDE Workspace Paths
+*.code-workspace
