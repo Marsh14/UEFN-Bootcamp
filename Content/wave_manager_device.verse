@@ -4,34 +4,43 @@ using { /UnrealEngine.com/Temporary/Diagnostics }
 
 wave_manager_device := class(creative_device):
 
-    # A single array to hold every spawner on your map
     @editable
-    AllSpawners : []creature_spawner_device = array{}
+    AllSpawners : []npc_spawner_device = array{}
 
-    # This runs the moment the game starts
+    # 1. Add references to our two critical devices
+    @editable
+    TownHall : objective_device = objective_device{}
+    
+    @editable
+    EndGameReferee : end_game_device = end_game_device{}
+
     OnBegin<override>()<suspends>:void=
         Print("Wave Manager Initialized!")
         
-        # Disable all spawners immediately just in case
+        # 2. Tell Verse to listen for the exact moment the Town Hall is destroyed
+        TownHall.DestroyedEvent.Subscribe(OnBaseDestroyed)
+        
         DisableSpawners(AllSpawners)
-
-        # Wait 5 seconds before the very first wave starts
         Sleep(5.0)
         
-        # Start the endless wave loop
         loop:
             Print("Spawning a new wave!")
             TriggerWave(AllSpawners)
-            
-            # Wait exactly 10 seconds before the loop repeats
-            Sleep(10.0)
+            Sleep(12.0)
 
-    TriggerWave(Spawners : []creature_spawner_device):void=
+    OnBaseDestroyed(Destroyer : agent):void=
+        Print("Base destroyed! Game Over.")
+        
+        # NPCs are not allowed to trigger game-ending devices. 
+        # We bypass this by finding the actual player and using them to trigger the defeat screen
+        if (ValidPlayer := GetPlayspace().GetPlayers()[0]):
+            EndGameReferee.Activate(ValidPlayer)
+
+    TriggerWave(Spawners : []npc_spawner_device):void=
         for (Spawner : Spawners):
-            # Disabling then immediately enabling forces the device to spit out a new burst of zombies
-            Spawner.Disable()
             Spawner.Enable()
+            Spawner.Spawn()
 
-    DisableSpawners(Spawners : []creature_spawner_device):void=
+    DisableSpawners(Spawners : []npc_spawner_device):void=
         for (Spawner : Spawners):
             Spawner.Disable()
