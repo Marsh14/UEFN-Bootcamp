@@ -1,6 +1,7 @@
 using { /Fortnite.com/Devices }
 using { /Verse.org/Simulation }
 using { /UnrealEngine.com/Temporary/Diagnostics }
+using { /UnrealEngine.com/Temporary/UI }
 
 wave_manager_device := class(creative_device):
 
@@ -14,6 +15,12 @@ wave_manager_device := class(creative_device):
     @editable
     EndGameReferee : end_game_device = end_game_device{}
 
+    var Widget : ZombieDefense.WaveUI = ZombieDefense.WaveUI{}
+
+    Message1<localizes> : message = ""
+    Message2<localizes> : message = "A new wave is coming..."
+
+    # This runs the moment the game starts
     OnBegin<override>()<suspends>:void=
         Print("Wave Manager Initialized!")
         
@@ -26,7 +33,10 @@ wave_manager_device := class(creative_device):
         loop:
             Print("Spawning a new wave!")
             TriggerWave(AllSpawners)
-            Sleep(12.0)
+            set Widget.MyMessage = Message2
+            Sleep(6.0)
+            set Widget.MyMessage = Message1
+            Sleep(6.0)
 
     OnBaseDestroyed(Destroyer : agent):void=
         Print("Base destroyed! Game Over.")
