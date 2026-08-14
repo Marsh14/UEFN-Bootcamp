@@ -12,11 +12,15 @@ wave_manager_device := class(creative_device):
     @editable 
     PlayerSpawner : player_spawner_device = player_spawner_device{}
     # 1. Add references to our two critical devices
+
     @editable
     TownHall : objective_device = objective_device{}
     
     @editable
     EndGameReferee : end_game_device = end_game_device{}
+
+    @editable
+    var ZombiesPerSpawner : int = 2
 
     var WidgetMap : [player]ZombieDefense.WaveUI = map{}
     var Widget : ZombieDefense.WaveUI = ZombieDefense.WaveUI{}
@@ -30,6 +34,7 @@ wave_manager_device := class(creative_device):
         PlayerSpawner.SpawnedEvent.Subscribe(SpawnedEvent)
         
         # 2. Tell Verse to listen for the exact moment the Town Hall is destroyed
+
         TownHall.DestroyedEvent.Subscribe(OnBaseDestroyed)
             
         DisableSpawners(AllSpawners)
@@ -47,16 +52,19 @@ wave_manager_device := class(creative_device):
 
     OnBaseDestroyed(Destroyer : agent):void=
         Print("Base destroyed! Game Over.")
-        
-        # NPCs are not allowed to trigger game-ending devices. 
-        # We bypass this by finding the actual player and using them to trigger the defeat screen
         if (ValidPlayer := GetPlayspace().GetPlayers()[0]):
             EndGameReferee.Activate(ValidPlayer)
 
-    TriggerWave(Spawners : []npc_spawner_device):void=
+    # Added <suspends> so we can use Sleep()
+    TriggerWave(Spawners : []npc_spawner_device)<suspends>:void=
         for (Spawner : Spawners):
             Spawner.Enable()
-            Spawner.Spawn()
+            
+            for (i := 1..ZombiesPerSpawner):
+                Spawner.Spawn()
+                Sleep(0.1) # buffer to update internal state
+        if(ZombiesPerSpawner < 10):
+            set ZombiesPerSpawner = ZombiesPerSpawner + 1
 
     DisableSpawners(Spawners : []npc_spawner_device):void=
         for (Spawner : Spawners):
