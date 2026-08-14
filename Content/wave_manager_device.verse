@@ -8,6 +8,9 @@ wave_manager_device := class(creative_device):
     @editable
     AllSpawners : []npc_spawner_device = array{}
 
+
+    @editable 
+    PlayerSpawner : player_spawner_device = player_spawner_device{}
     # 1. Add references to our two critical devices
     @editable
     TownHall : objective_device = objective_device{}
@@ -15,6 +18,7 @@ wave_manager_device := class(creative_device):
     @editable
     EndGameReferee : end_game_device = end_game_device{}
 
+    var WidgetMap : [player]ZombieDefense.WaveUI = map{}
     var Widget : ZombieDefense.WaveUI = ZombieDefense.WaveUI{}
 
     Message1<localizes> : message = ""
@@ -23,19 +27,22 @@ wave_manager_device := class(creative_device):
     # This runs the moment the game starts
     OnBegin<override>()<suspends>:void=
         Print("Wave Manager Initialized!")
+        PlayerSpawner.SpawnedEvent.Subscribe(SpawnedEvent)
         
         # 2. Tell Verse to listen for the exact moment the Town Hall is destroyed
         TownHall.DestroyedEvent.Subscribe(OnBaseDestroyed)
-        
+            
         DisableSpawners(AllSpawners)
         Sleep(5.0)
         
         loop:
             Print("Spawning a new wave!")
             TriggerWave(AllSpawners)
-            set Widget.MyMessage = Message2
+            for (Player -> ActiveUI : WidgetMap):
+                set ActiveUI.MyMessage = Message2
             Sleep(6.0)
-            set Widget.MyMessage = Message1
+            for (Player -> ActiveUI : WidgetMap):
+                set ActiveUI.MyMessage = Message1
             Sleep(6.0)
 
     OnBaseDestroyed(Destroyer : agent):void=
@@ -54,3 +61,13 @@ wave_manager_device := class(creative_device):
     DisableSpawners(Spawners : []npc_spawner_device):void=
         for (Spawner : Spawners):
             Spawner.Disable()
+
+    SpawnedEvent(SpawnedAgent : agent):void=
+        if(PlayerRef := player[SpawnedAgent], PlayerUI := GetPlayerUI[PlayerRef]):
+            if (not WidgetMap[PlayerRef]):
+                NewWidget := ZombieDefense.WaveUI{}
+                 set NewWidget.MyMessage = Message1
+                    if (set WidgetMap[PlayerRef] = NewWidget):
+                        # Push the UMG widget layout directly to the player screen
+                        PlayerUI.AddWidget(NewWidget)
+    
